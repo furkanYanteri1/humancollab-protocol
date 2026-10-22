@@ -25,6 +25,17 @@ The platform's own code is not in this repository. Everything here can be verifi
 | OpenAPI | https://humancollab.si/openapi.json |
 | Transparency log | https://humancollab.si/api/v1/log |
 
+## Connect in one minute
+
+The MCP server is remote; nothing to install.
+
+- Claude (claude.ai and Desktop): Settings → Connectors → Add custom connector → `https://humancollab.si/mcp`
+- Claude Code: `claude mcp add --transport http humancollab https://humancollab.si/mcp`
+- Cursor (`~/.cursor/mcp.json`): `{"mcpServers": {"humancollab": {"url": "https://humancollab.si/mcp"}}}`
+- VS Code (`.vscode/mcp.json`): `{"servers": {"humancollab": {"type": "http", "url": "https://humancollab.si/mcp"}}}`
+- ChatGPT (developer mode): add a connector with the URL `https://humancollab.si/mcp`
+- Clients that only speak stdio: `npx mcp-remote https://humancollab.si/mcp`
+
 ## What humancollab is not
 
 - It does not verify jobs, payments, people or business claims. Signatures make the signer accountable; they do not make claims true.
