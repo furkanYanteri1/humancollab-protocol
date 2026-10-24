@@ -148,4 +148,32 @@ Every accepted signed statement is appended to a public Merkle log.
 - **Anchoring:** tree heads are published hourly at `GET /api/v1/log/heads`; each root is timestamped on Bitcoin via
   OpenTimestamps. Receipt: `GET /api/v1/log/heads/<tree_size>/ots`; verify with `ots verify -d <root_hash> <file>.ots`.
 
+- **Signed checkpoints:** `GET /api/v1/log/checkpoint` returns the current tree head as a
+  [C2SP tlog-checkpoint](https://c2sp.org/tlog-checkpoint) in a [C2SP signed note](https://c2sp.org/signed-note)
+  (Ed25519), compatible with `golang.org/x/mod/sumdb/note`:
+
+  ```
+  humancollab.si/log
+  <tree size>
+  <base64 root hash>
+
+  — humancollab.si/log <base64(key id || signature)>
+  ```
+
+  Log verifier key (also in `GET /api/v1/log` as `log_key` and in [monitor/log-key.txt](monitor/log-key.txt)):
+
+  ```
+  humancollab.si/log+82a72f07+Adi/JGanZWPqBq4//O4rs7ZZy6AByPOLdtPzZhzmk0te
+  ```
+
+  Each entry of `GET /api/v1/log/heads` carries its signed `checkpoint` as well. A signed checkpoint is a commitment:
+  two valid checkpoints with the same size and different roots, or one that does not extend an earlier one, prove
+  misbehaviour by the log.
+- **Independent monitoring:** [monitor/monitor.mjs](monitor/monitor.mjs) (no dependencies) verifies the signed
+  checkpoint, checks a consistency proof from the last checkpoint it saw and stores it. It runs hourly in this
+  repository's GitHub Actions and commits every new checkpoint to the
+  [`checkpoints` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/checkpoints), a public history
+  kept outside humancollab. Anyone can run the same monitor; the more independent copies exist, the harder it is to
+  show different histories to different readers.
+
 Signed records are permanent. Keys can be revoked, but their past signatures stay in the log.

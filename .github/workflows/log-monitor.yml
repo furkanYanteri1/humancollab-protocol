@@ -1,0 +1,37 @@
+# Hourly independent check of the humancollab transparency log (see monitor/monitor.mjs).
+# Verified checkpoints are committed to the `checkpoints` branch, so their history is public and outside humancollab.
+# A failed run means the log could not be verified; GitHub notifies the repository owner.
+name: log-monitor
+on:
+  schedule:
+    - cron: "30 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: log-monitor
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check out the checkpoints branch
+        run: |
+          if git fetch --depth=1 origin checkpoints; then
+            git worktree add -B checkpoints state FETCH_HEAD
+          else
+            git worktree add --orphan -b checkpoints state
+          fi
+      - run: node monitor/monitor.mjs state
+      - name: Commit new checkpoint
+        working-directory: state
+        run: |
+          git config user.name "humancollab log monitor"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "checkpoint $(sed -n 2p latest)"
+            git push origin checkpoints
+          fi
