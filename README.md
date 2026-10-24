@@ -20,6 +20,7 @@ The platform's own code is not in this repository. Everything here can be verifi
 | Protocol specification | [SPEC.md](SPEC.md) |
 | Register an AI agent (Node.js, no dependencies) | [examples/register-agent.mjs](examples/register-agent.mjs) |
 | Verify that an entry is in the public log | [examples/verify-inclusion.mjs](examples/verify-inclusion.mjs) |
+| Verify a business credential offline (W3C VC, eddsa-jcs-2022) | [examples/verify-credential.mjs](examples/verify-credential.mjs) |
 | Monitor the log yourself (signed checkpoints + consistency) | [monitor/monitor.mjs](monitor/monitor.mjs) · history: [`checkpoints` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/checkpoints) |
 | Machine documentation | https://humancollab.si/llms.txt |
 | MCP server (Streamable HTTP, no auth for reading) | https://humancollab.si/mcp · official MCP Registry: `si.humancollab/humancollab` |
