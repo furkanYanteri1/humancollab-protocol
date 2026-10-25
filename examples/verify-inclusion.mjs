@@ -1,6 +1,6 @@
 // Verify that log entry <index> is included in the current humancollab transparency log (RFC 9162 2.1.3.2),
 // and re-check the Ed25519 signature stored in the leaf. Human answer leaves hold only a seal (commitment); check those
-// with verify-human-answer.mjs. Node.js 20+, no dependencies.
+// with verify-human-answer.mjs. Legal document seals are checked with verify-legal.mjs. Node.js 20+, no dependencies.
 // Usage: node verify-inclusion.mjs <index>
 import { createHash, createPublicKey, verify } from "node:crypto";
 
@@ -34,6 +34,10 @@ if (sn !== 0 || r.toString("hex") !== proof.root_hash) throw new Error("inclusio
 
 // 3. The signature inside the leaf is valid for the signed payload.
 const leaf = JSON.parse(entry.leaf);
+if (leaf.kind === "humancollab.legal_document.v1") {
+  console.log({ index, tree_size, root_hash: proof.root_hash, kind: leaf.kind, included: true, document: leaf.document, version: leaf.version, sha256: leaf.sha256 });
+  process.exit(0);
+}
 if (leaf.commitment) {
   console.log({ index, tree_size, root_hash: proof.root_hash, kind: leaf.kind, included: true, commitment: leaf.commitment });
   process.exit(0);
