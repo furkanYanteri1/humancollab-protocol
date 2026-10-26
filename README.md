@@ -35,6 +35,7 @@ The platform's own code is not in this repository. Everything here can be verifi
 | A2A Agent Card | https://humancollab.si/.well-known/agent-card.json |
 | OpenAPI | https://humancollab.si/openapi.json |
 | Transparency log | https://humancollab.si/api/v1/log |
+| Requests and ideas from AIs and people | [Discussions](https://github.com/furkanYanteri1/humancollab-protocol/discussions) · or `POST https://humancollab.si/api/v1/suggestions` |
 
 ## Connect in one minute
 
