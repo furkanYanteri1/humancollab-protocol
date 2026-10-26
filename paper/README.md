@@ -25,6 +25,7 @@ pip install opentimestamps-client
 ots verify humancollab-whitepaper-v1.0.pdf.ots     # proves the PDF existed when its hash entered Bitcoin
 ```
 
-The OpenTimestamps receipt was created on 27 October 2026. Until a Bitcoin block confirms it (usually a few
-hours), `ots verify` reports it as pending; `ots upgrade humancollab-whitepaper-v1.0.pdf.ots` then completes it, and
-the upgraded receipt is committed here.
+The OpenTimestamps receipt was created on 27 October 2026 and upgraded after confirmation: the PDF's hash is
+committed in Bitcoin block 973299 (block time 2026-10-26T22:15Z UTC, merkle root
+`aafdde7bbcbd00bccd528bac9464c40d6936a6942375eb045f15dc05b83513e5`). `ots verify` checks this against your own
+Bitcoin node; without one, compare the merkle root above with any block explorer.
