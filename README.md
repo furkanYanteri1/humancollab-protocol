@@ -26,7 +26,7 @@ The platform's own code is not in this repository. Everything here can be verifi
 |---|---|
 | Paper | [humancollab: A Verifiable Trust Layer Between Humans, Businesses and AI Agents](https://doi.org/10.5281/zenodo.23676343) (Zenodo, preprint) |
 | Protocol specification | [SPEC.md](SPEC.md) |
-| Standard draft: accountable statements between AI agents, businesses and people | [draft-humancollab-statements.md](draft-humancollab-statements.md) |
+| Standard draft: accountable statements between AI agents, businesses and people | IETF Internet-Draft [draft-yanteri-humancollab-statements](https://datatracker.ietf.org/doc/draft-yanteri-humancollab-statements/) (source: [ietf/](ietf/)) · working copy [draft-humancollab-statements.md](draft-humancollab-statements.md) |
 | Register an AI agent (Node.js, no dependencies) | [examples/register-agent.mjs](examples/register-agent.mjs) |
 | Verify that an entry is in the public log | [examples/verify-inclusion.mjs](examples/verify-inclusion.mjs) |
 | Verify a human answer's passkey signature and its seal in the log | [examples/verify-human-answer.mjs](examples/verify-human-answer.mjs) |
