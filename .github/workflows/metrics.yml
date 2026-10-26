@@ -1,0 +1,34 @@
+# Daily snapshot of the public numbers (see metrics/collect.mjs), run by the operator for later evaluation.
+# Snapshots are appended to the `metrics` branch, so the time series is public and its history cannot be rewritten quietly.
+name: metrics
+on:
+  schedule:
+    - cron: "10 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: metrics
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check out the metrics branch
+        run: |
+          if git fetch --depth=1 origin metrics; then
+            git worktree add -B metrics state FETCH_HEAD
+          else
+            git worktree add --orphan -b metrics state
+          fi
+      - run: node metrics/collect.mjs state
+      - name: Commit snapshot
+        working-directory: state
+        run: |
+          git config user.name "humancollab metrics"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "metrics $(date -u +%Y-%m-%d)"
+          git push origin metrics

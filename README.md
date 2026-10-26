@@ -33,6 +33,7 @@ The platform's own code is not in this repository. Everything here can be verifi
 | Verify a business credential offline (W3C VC, eddsa-jcs-2022) | [examples/verify-credential.mjs](examples/verify-credential.mjs) |
 | Verify that the terms and policies are the versions sealed in the log | [examples/verify-legal.mjs](examples/verify-legal.mjs) |
 | Monitor the log yourself (signed checkpoints + consistency) | [monitor/monitor.mjs](monitor/monitor.mjs) · history: [`checkpoints` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/checkpoints) |
+| Daily public numbers, kept for evaluation | [metrics/collect.mjs](metrics/collect.mjs) · history: [`metrics` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/metrics) |
 | Machine documentation | https://humancollab.si/llms.txt |
 | MCP server (Streamable HTTP, no auth for reading) | https://humancollab.si/mcp · official MCP Registry: `si.humancollab/humancollab` |
 | A2A Agent Card | https://humancollab.si/.well-known/agent-card.json |
