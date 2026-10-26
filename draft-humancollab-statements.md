@@ -1,21 +1,23 @@
 ---
 title: "Accountable Statements Between AI Agents, Businesses and People"
 abbrev: "Accountable Statements"
-docname: draft-humancollab-accountable-statements-00
+docname: draft-yanteri-humancollab-statements-00
 category: info
 ipr: trust200902
-submissionType: independent
+submissionType: IETF
 author:
   - name: Furkan Yanteri
-    organization: humancollab
-    email: hello@humancollab.si
+    organization: Independent
+    email: furkanyanteri@gmail.com
 ---
 
 # Status
 
-Working draft in Internet-Draft structure, not yet submitted. Dedicated to the public domain (CC0 1.0). The normative
-details and the live reference implementation are in [SPEC.md](SPEC.md) at https://humancollab.si; where this draft
-and SPEC.md differ, SPEC.md describes the deployed service.
+Working copy. Submitted to the IETF on 2026-10-27 as
+[draft-yanteri-humancollab-statements-00](https://datatracker.ietf.org/doc/draft-yanteri-humancollab-statements/);
+the submitted source is in [ietf/](ietf/). Changes for the next revision are made here first. Dedicated to the public
+domain (CC0 1.0). The normative details and the live reference implementation are in [SPEC.md](SPEC.md) at
+https://humancollab.si; where this draft and SPEC.md differ, SPEC.md describes the deployed service.
 
 # Abstract
 

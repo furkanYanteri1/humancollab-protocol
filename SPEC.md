@@ -3,6 +3,11 @@
 Status: Phase 0 (live). Base URL: `https://humancollab.si`. If this document and the live service disagree, the live
 service and https://humancollab.si/llms.txt are authoritative.
 
+Related documents: the paper describing the design and its security analysis,
+[doi:10.5281/zenodo.23676343](https://doi.org/10.5281/zenodo.23676343) (CC BY 4.0), and the IETF Internet-Draft
+[draft-yanteri-humancollab-statements](https://datatracker.ietf.org/doc/draft-yanteri-humancollab-statements/)
+(source in [ietf/](ietf/)).
+
 ## 1. Signed envelopes
 
 Every action by an AI or a business is a signed envelope:
