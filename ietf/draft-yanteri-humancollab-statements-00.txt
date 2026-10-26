@@ -1,0 +1,448 @@
+
+
+
+
+Network Working Group                                         F. Yanteri
+Internet-Draft                                               Independent
+Intended status: Informational                           27 October 2026
+Expires: 30 April 2027
+
+
+    Accountable Statements Between AI Agents, Businesses and People
+                draft-yanteri-humancollab-statements-00
+
+Abstract
+
+   AI agents increasingly act on information they cannot check: what a
+   business can supply, what a person said, what rules a platform
+   applies.  This document describes a minimal way to make such
+   statements accountable.  Every statement is signed by its author,
+   bound where possible to a domain the author controls, and sealed in a
+   public append-only Merkle log whose tree heads are signed,
+   timestamped and publicly monitored.  The design proves who said what
+   and when, and that the record was not rewritten.  It deliberately
+   does not attempt to prove that a statement is true.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 30 April 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 1]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
+   3.  Statements  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     3.1.  Canonical Form  . . . . . . . . . . . . . . . . . . . . .   3
+     3.2.  Envelopes for Agents and Businesses . . . . . . . . . . .   3
+     3.3.  Domain Binding  . . . . . . . . . . . . . . . . . . . . .   4
+     3.4.  Statements by People  . . . . . . . . . . . . . . . . . .   4
+   4.  Log . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     4.1.  Leaves for Signed Statements  . . . . . . . . . . . . . .   4
+     4.2.  Seals . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     4.3.  Tree Heads, Anchoring and Monitoring  . . . . . . . . . .   5
+   5.  Portable Attestations . . . . . . . . . . . . . . . . . . . .   5
+   6.  What Readers Can Conclude . . . . . . . . . . . . . . . . . .   5
+   7.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .   6
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .   6
+     10.2.  Informative References . . . . . . . . . . . . . . . . .   7
+   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
+
+1.  Introduction
+
+   Search results, marketing pages and machine-generated text give an AI
+   agent no way to tell an accountable statement from an anonymous one.
+   Reputation scores can be bought or gamed.  Certification does not
+   scale to every sector.
+
+   This document takes a narrower goal that can be verified
+   mechanically:
+
+   1.  Origin: a statement was signed by a specific key, and that key
+       was bound to a specific domain or device.
+
+   2.  Integrity: the statement has not changed since it was signed.
+
+   3.  Non-repudiation over time: the statement was publicly recorded at
+       a known time, and the record cannot be edited, removed or shown
+       differently to different readers without detection.
+
+
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 2]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+   Truth is left to the reader.  An AI weighs accountable statements
+   with its own sources, as a journalist weighs on-the-record quotes.
+
+   A deployed reference implementation is described in
+   [HUMANCOLLAB-SPEC]; the design and its security analysis are
+   described in [HUMANCOLLAB-PAPER].
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   Statement:  A JSON payload with a type and a timestamp, signed by its
+      author.
+
+   Author:  An AI agent, a business or a person.
+
+   Log:  A public append-only Merkle tree as defined in Section 2.1 of
+      [RFC9162].
+
+   Seal:  A log leaf that commits to content without containing it.
+
+3.  Statements
+
+3.1.  Canonical Form
+
+   Statements are serialized as canonical JSON: object keys sorted
+   recursively, no insignificant whitespace, and only strings, booleans,
+   null, arrays, objects and safe integers.  This is a subset of JSON
+   Canonicalization Scheme [RFC8785] that avoids floating-point
+   canonicalization.
+
+3.2.  Envelopes for Agents and Businesses
+
+   An envelope is {payload, public_key, signature} where public_key is a
+   raw Ed25519 key [RFC8032] and signature covers the UTF-8 bytes of the
+   canonical payload.  Receivers MUST reject envelopes with unknown
+   payload fields, timestamps outside a short window (five minutes in
+   the reference implementation) and payloads whose SHA-256 has been
+   seen before.
+
+   An agent's first statement SHOULD be a responsibility statement in
+   which it accepts responsibility for its actions; every later action
+   is signed by the same key.
+
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 3]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+3.3.  Domain Binding
+
+   A key is bound to a domain by a DNS TXT record _humancollab.<domain>
+   whose value names the key, for example humancollab-business=<base64
+   public key> or humancollab-agent=<base64 public key>.  An HTTPS file
+   at /.well-known/humancollab.txt MAY be accepted for a first binding.
+   Replacing the key of an established binding MUST require the DNS
+   proof; the previous key MUST NOT be reusable for any domain
+   afterwards, and every key MUST remain visible in a public key history
+   with the log index of the first statement it signed.
+
+3.4.  Statements by People
+
+   People sign with WebAuthn passkeys [WEBAUTHN].  The WebAuthn
+   challenge is base64url(SHA-256(canonical statement)), where the
+   statement contains the content, its license and a single-use nonce
+   issued by the service.  The service publishes the complete assertion
+   (authenticator data, client data, signature and public key) to
+   whoever the statement is addressed to.  Only a seal of it enters the
+   log (Section 4.2), so the log alone neither reveals content nor links
+   two statements by the same person.
+
+   Passkeys raise the cost of automation; they are not proof of a unique
+   human, and services SHOULD say so.
+
+4.  Log
+
+4.1.  Leaves for Signed Statements
+
+   A leaf for a signed statement is the canonical JSON object
+
+   {"canonical": <canonical payload>, "kind": <payload type>,
+    "public_key": <base64>, "signature": <base64>,
+    "statement_seq": <integer>}
+
+   Anyone can re-verify the signature from the leaf alone.
+
+4.2.  Seals
+
+   Statement by a person:  {"commitment": hex(SHA-256(canonical
+      assertion package)), "kind": <type>}.
+
+   Rules of the service:  {"document": <name>, "kind":
+      "humancollab.legal_document.v1", "sha256": <hex of the plain
+      text>, "url": <address of that version>, "version": <identifier>}.
+      Every version of the service's terms and policies MUST be sealed,
+      and every sealed version MUST remain available at its url, so that
+      a silent change of the rules is detectable.
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 4]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+4.3.  Tree Heads, Anchoring and Monitoring
+
+   Leaves are hashed as in [RFC9162]: SHA-256(0x00 || leaf) and SHA-
+   256(0x01 || left || right).  The log serves inclusion and consistency
+   proofs, signs tree heads as checkpoints [C2SP-CHECKPOINT] in signed
+   notes [C2SP-SIGNED-NOTE], and timestamps each published root on
+   Bitcoin through OpenTimestamps [OPENTIMESTAMPS].  Monitors verify
+   each checkpoint's signature and its consistency with the last one
+   they saw, and keep their own copies; anyone can run one, and the
+   operator runs one outside the service's infrastructure.  Two valid
+   checkpoints of the same size with different roots prove misbehaviour
+   by the log.
+
+5.  Portable Attestations
+
+   A service MAY issue Verifiable Credentials [VC-DATA-MODEL] (Data
+   Integrity, eddsa-jcs-2022 [VC-DI-EDDSA]) stating that a domain was
+   proven by a given method and that a statement version was signed by
+   the bound key and logged at a given index.  Such a credential MUST
+   state that it does not attest the truth of the statement.
+
+6.  What Readers Can Conclude
+
+     +=============================+=================================+
+     | Reader checks               | Conclusion                      |
+     +=============================+=================================+
+     | Signature valid, key bound  | The domain's controller made    |
+     | to domain by DNS            | this statement                  |
+     +-----------------------------+---------------------------------+
+     | Leaf included in a          | The statement was public at     |
+     | checkpoint seen by monitors | that time and was not rewritten |
+     +-----------------------------+---------------------------------+
+     | Key history shows a recent  | Weigh the change; control of    |
+     | change                      | the domain changed hands or was |
+     |                             | re-proven                       |
+     +-----------------------------+---------------------------------+
+     | Statement contradicted by   | The author is accountable for a |
+     | independent sources         | false statement                 |
+     +-----------------------------+---------------------------------+
+
+                   Table 1: Conclusions a reader can draw
+
+
+
+
+
+
+
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 5]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+7.  Privacy Considerations
+
+   The log stores no personal data for people: only seals.  Services
+   SHOULD NOT store IP addresses or biometric data; WebAuthn keeps
+   biometrics on the user's device.  Content published under a public
+   license cannot be recalled once copied; services MUST make this
+   clear.
+
+8.  Security Considerations
+
+   *  Control of a domain's DNS is control of its statements.  Readers
+      SHOULD weigh recent key changes.
+
+   *  A log operator can refuse to log or can present split views;
+      signed checkpoints, Bitcoin timestamps and monitors run by parties
+      other than the operator make split views detectable but not
+      impossible to attempt.  Witness cosigning [C2SP-WITNESS] further
+      reduces this risk.
+
+   *  Self-declared client names (user agents) used for usage counts are
+      not authenticated and MUST be labelled as such.
+
+   *  Publishing a person's full assertion links all statements signed
+      with the same passkey; services MUST disclose this before signing.
+
+9.  IANA Considerations
+
+   This document has no IANA actions.
+
+10.  References
+
+10.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
+              Signature Algorithm (EdDSA)", RFC 8032,
+              DOI 10.17487/RFC8032, January 2017,
+              <https://www.rfc-editor.org/rfc/rfc8032>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 6]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+   [RFC8785]  Rundgren, A., Jordan, B., and S. Erdtman, "JSON
+              Canonicalization Scheme (JCS)", RFC 8785,
+              DOI 10.17487/RFC8785, June 2020,
+              <https://www.rfc-editor.org/rfc/rfc8785>.
+
+   [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
+              Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
+              December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
+
+   [WEBAUTHN] W3C, "Web Authentication: An API for accessing Public Key
+              Credentials, Level 3", n.d.,
+              <https://www.w3.org/TR/webauthn-3/>.
+
+10.2.  Informative References
+
+   [C2SP-CHECKPOINT]
+              C2SP, "Transparency Log Checkpoints", n.d.,
+              <https://c2sp.org/tlog-checkpoint>.
+
+   [C2SP-SIGNED-NOTE]
+              C2SP, "Signed Note", n.d., <https://c2sp.org/signed-note>.
+
+   [C2SP-WITNESS]
+              C2SP, "Transparency Log Witness Protocol", n.d.,
+              <https://c2sp.org/tlog-witness>.
+
+   [HUMANCOLLAB-PAPER]
+              Yanteri, F., "humancollab: A Verifiable Trust Layer
+              Between Humans, Businesses and AI Agents",
+              DOI 10.5281/zenodo.23676343, October 2026,
+              <https://doi.org/10.5281/zenodo.23676343>.
+
+   [HUMANCOLLAB-SPEC]
+              humancollab, "humancollab protocol specification", n.d.,
+              <https://github.com/furkanYanteri1/humancollab-
+              protocol/blob/main/SPEC.md>.
+
+   [OPENTIMESTAMPS]
+              OpenTimestamps, "OpenTimestamps", n.d.,
+              <https://opentimestamps.org>.
+
+   [VC-DATA-MODEL]
+              W3C, "Verifiable Credentials Data Model v2.0", n.d.,
+              <https://www.w3.org/TR/vc-data-model-2.0/>.
+
+   [VC-DI-EDDSA]
+              W3C, "Data Integrity EdDSA Cryptosuites v1.0", n.d.,
+              <https://www.w3.org/TR/vc-di-eddsa/>.
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 7]
+
+Internet-Draft           Accountable Statements             October 2026
+
+
+Acknowledgments
+
+   The reference implementation and its specification are public domain
+   (CC0 1.0) at https://github.com/furkanYanteri1/humancollab-protocol.
+
+Author's Address
+
+   Furkan Yanteri
+   Independent
+   Email: furkanyanteri@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yanteri                   Expires 30 April 2027                 [Page 8]
