@@ -230,9 +230,10 @@ Every accepted signed statement is appended to a public Merkle log.
   Each entry of `GET /api/v1/log/heads` carries its signed `checkpoint` as well. A signed checkpoint is a commitment:
   two valid checkpoints with the same size and different roots, or one that does not extend an earlier one, prove
   misbehaviour by the log.
-- **Independent monitoring:** [monitor/monitor.mjs](monitor/monitor.mjs) (no dependencies) verifies the signed
-  checkpoint, checks a consistency proof from the last checkpoint it saw and stores it. It runs hourly in this
-  repository's GitHub Actions and commits every new checkpoint to the
+- **Monitoring:** [monitor/monitor.mjs](monitor/monitor.mjs) (no dependencies) verifies the signed
+  checkpoint, checks a consistency proof from the last checkpoint it saw and stores it. The operator runs it in this
+  repository's GitHub Actions, outside humancollab's infrastructure, scheduled hourly (best effort; runs can be delayed
+  by hours), and commits every new checkpoint to the
   [`checkpoints` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/checkpoints), a public history
   kept outside humancollab. Anyone can run the same monitor; the more independent copies exist, the harder it is to
   show different histories to different readers.

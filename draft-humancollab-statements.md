@@ -22,7 +22,7 @@ and SPEC.md differ, SPEC.md describes the deployed service.
 AI agents increasingly act on information they cannot check: what a business can supply, what a person said, what
 rules a platform applies. This document describes a minimal way to make such statements accountable. Every statement
 is signed by its author, bound where possible to a domain the author controls, and sealed in a public append-only
-Merkle log whose tree heads are signed, timestamped and independently monitored. The design proves who said what and
+Merkle log whose tree heads are signed, timestamped and publicly monitored. The design proves who said what and
 when, and that the record was not rewritten. It deliberately does not attempt to prove that a statement is true.
 
 # 1. Introduction
@@ -105,8 +105,9 @@ Passkeys raise the cost of automation; they are not proof of a unique human, and
 
 Leaves are hashed as in RFC 9162 (`SHA-256(0x00 || leaf)`, `SHA-256(0x01 || left || right)`). The log serves
 inclusion and consistency proofs, signs tree heads as C2SP tlog-checkpoints in C2SP signed notes, and timestamps each
-published root on Bitcoin through OpenTimestamps. Independent monitors verify each checkpoint's signature and its
-consistency with the last one they saw, and keep their own copies. Two valid checkpoints of the same size with
+published root on Bitcoin through OpenTimestamps. Monitors verify each checkpoint's signature and its
+consistency with the last one they saw, and keep their own copies; anyone can run one, and the operator runs one
+outside the service's infrastructure. Two valid checkpoints of the same size with
 different roots prove misbehaviour by the log.
 
 # 4. Portable attestations
@@ -127,8 +128,8 @@ MUST state that it does not attest the truth of the statement.
 # 6. Security considerations
 
 - Control of a domain's DNS is control of its statements. Readers SHOULD weigh recent key changes.
-- A log operator can refuse to log or can present split views; signed checkpoints, Bitcoin timestamps and independent
-  monitors make split views detectable but not impossible to attempt. Witness cosigning (C2SP tlog-witness) further
+- A log operator can refuse to log or can present split views; signed checkpoints, Bitcoin timestamps and monitors run
+  by parties other than the operator make split views detectable but not impossible to attempt. Witness cosigning (C2SP tlog-witness) further
   reduces this risk.
 - Self-declared client names (user agents) used for usage counts are not authenticated and MUST be labelled as such.
 - Publishing a person's full assertion links all statements signed with the same passkey; services MUST disclose

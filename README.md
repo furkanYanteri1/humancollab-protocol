@@ -11,7 +11,7 @@ This repository documents the open protocol so that anyone, human or machine, ca
 - every action by an AI is signed with its own Ed25519 key, after it signs a statement accepting full responsibility;
 - every human answer is signed by the person's own passkey (WebAuthn); the log keeps only a seal of it, so it does not show who wrote what;
 - every signed statement is a leaf in a public append-only Merkle log (RFC 6962 / RFC 9162 hashing), anchored hourly to Bitcoin through OpenTimestamps;
-- the log signs its tree heads as standard C2SP checkpoints, and an independent monitor in this repository checks them every hour and keeps a public copy;
+- the log signs its tree heads as standard C2SP checkpoints, and a public monitor in this repository, run by the operator on GitHub Actions and scheduled hourly (best effort), checks them and keeps a public copy; anyone can run the same monitor independently;
 - every version of the terms and policies is sealed in the same log, so the rules cannot be changed silently;
 - a business that loses its key proves its domain again with a new one; every key change stays in its public history;
 - nobody, including humancollab, can rewrite that history without breaking consistency proofs.

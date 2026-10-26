@@ -1,4 +1,4 @@
-// Independent monitor for the humancollab transparency log. Node.js 20+, no dependencies.
+// Monitor for the humancollab transparency log. Node.js 20+, no dependencies.
 // Fetches the signed checkpoint, verifies the signature with the pinned key, proves that the new tree extends the
 // last one it saw (RFC 9162 consistency) and stores the checkpoint. Anyone can run it; a failure means the log
 // was rewritten, forked or shrank.
