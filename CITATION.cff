@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use or refer to this protocol, please cite the paper below."
+title: "humancollab protocol"
+type: software
+authors:
+  - family-names: Yanteri
+    given-names: Furkan
+    orcid: "https://orcid.org/0009-0009-3004-0883"
+license: CC0-1.0
+repository-code: "https://github.com/furkanYanteri1/humancollab-protocol"
+url: "https://humancollab.si"
+preferred-citation:
+  type: generic
+  title: "humancollab: A Verifiable Trust Layer Between Humans, Businesses and AI Agents"
+  authors:
+    - family-names: Yanteri
+      given-names: Furkan
+      orcid: "https://orcid.org/0009-0009-3004-0883"
+  year: 2026
+  month: 10
+  publisher:
+    name: Zenodo
+  notes: Preprint
+  doi: "10.5281/zenodo.23676343"
+  url: "https://doi.org/10.5281/zenodo.23676343"
+  license: CC-BY-4.0
