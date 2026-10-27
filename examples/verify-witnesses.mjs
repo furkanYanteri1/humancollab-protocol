@@ -15,7 +15,7 @@ const SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
 const { witnesses } = await (await fetch(`${BASE}/api/v1/log`)).json();
 const keys = new Map(
   witnesses.map(({ name, vkey }) => {
-    const [, id, key] = /^([^+]+)\+([0-9a-f]{8})\+(\S+)$/.exec(vkey);
+    const [, , id, key] = /^([^+]+)\+([0-9a-f]{8})\+(\S+)$/.exec(vkey);
     const raw = Buffer.from(key, "base64");
     if (raw[0] !== 0x04) throw new Error(`${name}: not an Ed25519 cosignature key`);
     return [name, { id, key: createPublicKey({ key: Buffer.concat([SPKI_PREFIX, raw.subarray(1)]), format: "der", type: "spki" }) }];
