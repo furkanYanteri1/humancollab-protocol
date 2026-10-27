@@ -207,7 +207,7 @@ Every accepted signed statement is appended to a public Merkle log.
     same version and different hashes, would show that a rule was changed silently.
 - **Note:** Log entry 0 (2026-10-25T09:37:16Z) is a test seal written while verifying human answer signatures. No answer is attached to it.
 - **Hashing (RFC 6962):** `leaf_hash = SHA-256(0x00 || leaf_data)`, `node = SHA-256(0x01 || left || right)`. The empty tree's root is `SHA-256("")`.
-- **State:** `GET /api/v1/log` → `{tree_size, root_hash, latest_anchored_head}`.
+- **State:** `GET /api/v1/log` → `{tree_size, root_hash, origin, log_key, checkpoint, witnesses, latest_anchored_head}`.
 - **Entries:** `GET /api/v1/log/entries?start=<i>&count=<n>` → `{entries: [{index, leaf, leaf_hash, logged_at}]}`.
 - **Inclusion proof:** `GET /api/v1/log/proof?index=<i>&tree_size=<n>` → `{index, tree_size, leaf_hash, root_hash, audit_path: [hex]}` (verify with RFC 9162 §2.1.3.2).
 - **Consistency proof:** `GET /api/v1/log/consistency?first=<m>&second=<n>` → `{first, second, first_root, second_root, proof: [hex]}` (RFC 9162 §2.1.4.2).
@@ -235,6 +235,24 @@ Every accepted signed statement is appended to a public Merkle log.
   Each entry of `GET /api/v1/log/heads` carries its signed `checkpoint` as well. A signed checkpoint is a commitment:
   two valid checkpoints with the same size and different roots, or one that does not extend an earlier one, prove
   misbehaviour by the log.
+- **Witnesses:** after each hourly tree head, the log submits the head's signed checkpoint with an RFC 6962
+  consistency proof to independent witnesses ([C2SP tlog-witness](https://c2sp.org/tlog-witness) `add-checkpoint`).
+  A witness cosigns only if the checkpoint extends the last one it saw from this log, so a split view must fool every
+  witness. Witnesses are those that configure the [witness-network.org](https://witness-network.org) testing log list
+  and publish an Ed25519 cosigning key; their names and keys are in `GET /api/v1/log` as `witnesses`. A witness gets at
+  most one submission per hour, and only while it has not yet cosigned the latest head. Every cosignature is verified
+  with the witness's pinned key before it is stored; stored cosignatures are never changed or deleted. When a head has
+  cosignatures, they follow the log's signature in `GET /api/v1/log/checkpoint` (if the current tree size equals that
+  head) and in the head's `checkpoint` in `GET /api/v1/log/heads`, as
+  [C2SP tlog-cosignature](https://c2sp.org/tlog-cosignature) lines (`cosignature/v1`, key type 0x04):
+
+  ```
+  — <witness name> <base64(key id || 8-byte big-endian timestamp || Ed25519 signature)>
+  ```
+
+  The signed message is `cosignature/v1\ntime <timestamp>\n` followed by the checkpoint body. Verifiers that do not
+  know a witness key ignore its line, so the log signature verifies as before.
+  Verify with [examples/verify-witnesses.mjs](examples/verify-witnesses.mjs).
 - **Monitoring:** [monitor/monitor.mjs](monitor/monitor.mjs) (no dependencies) verifies the signed
   checkpoint, checks a consistency proof from the last checkpoint it saw and stores it. The operator runs it in this
   repository's GitHub Actions, outside humancollab's infrastructure, scheduled hourly (best effort; runs can be delayed

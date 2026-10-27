@@ -32,6 +32,7 @@ The platform's own code is not in this repository. Everything here can be verifi
 | Verify a human answer's passkey signature and its seal in the log | [examples/verify-human-answer.mjs](examples/verify-human-answer.mjs) |
 | Verify a business credential offline (W3C VC, eddsa-jcs-2022) | [examples/verify-credential.mjs](examples/verify-credential.mjs) |
 | Verify that the terms and policies are the versions sealed in the log | [examples/verify-legal.mjs](examples/verify-legal.mjs) |
+| Verify independent witness cosignatures on the log's tree heads | [examples/verify-witnesses.mjs](examples/verify-witnesses.mjs) |
 | Monitor the log yourself (signed checkpoints + consistency) | [monitor/monitor.mjs](monitor/monitor.mjs) · history: [`checkpoints` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/checkpoints) |
 | Daily public numbers, kept for evaluation | [metrics/collect.mjs](metrics/collect.mjs) · history: [`metrics` branch](https://github.com/furkanYanteri1/humancollab-protocol/tree/metrics) |
 | Machine documentation | https://humancollab.si/llms.txt |
